@@ -35,13 +35,13 @@ Finished at time <total time units>
 ...
 ```
 
-Error Handling
+Error Handling\
 Errors should be handled gracefully with specific messages:
   - Missing parameter: "Error: Missing parameter <parameter>"
   - Missing quantum for Round Robin: "Error: Missing quantum parameter when use is 'rr'"
   - No input file: "Usage: scheduler-gpt.py <input file>"
 
-Deliverables\
+Deliverables
   - Individual Prompts and Iterations: Each team member provides their prompts and iteration history.
   - Final Submission: The best result from the team, both in code and in the final conversation, with comments listing team members.
   - Final Report: A detailed evaluation of the AI-generated code, including correctness, efficiency, readability, completeness, innovation, and overall quality.
