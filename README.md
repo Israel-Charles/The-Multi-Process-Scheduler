@@ -1,5 +1,5 @@
 # The-ChatGPT-Process-Scheduler
-This software should implements 4 process scheduling algorithms: FIFO (First In, First Out), Pre-emptive Shortest Job First (SJF), Round Robin (RR), and Linux's CFS (Completely Fair Scheduler), — using ChatGPT in Python. The implementation should be able to simulate the scheduling of multiple processes under each algorithm and calculate their turnaround time, response time, and wait time. The following key components are required:
+This software should implement 4 process scheduling algorithms: FIFO (First In, First Out), Pre-emptive Shortest Job First (SJF), Round Robin (RR), and Linux's CFS (Completely Fair Scheduler), — using ChatGPT in Python. The implementation should be able to simulate the scheduling of multiple processes under each algorithm and calculate their turnaround time, response time, and wait time. The following key components are required:
 
 - Process Data Structure: Representing each process with its arrival time, execution time, and status.
 - Scheduler Functions: One function for each algorithm to handle a list of processes and implement the respective scheduling logic.
