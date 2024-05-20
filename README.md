@@ -7,7 +7,7 @@ This software should implement 4 process scheduling algorithms: FIFO (First In, 
 - Metric Calculation Functions: Functions to compute turnaround time, waiting time, and response time for each process.
 
 
-Input File Format
+Input File Format\
 The input file will have the following format:
 ```
 processcount <number of processes>
@@ -18,7 +18,7 @@ process name <name> arrival <arrival time> burst <burst time>
 end
 ```
 
-Output File Format
+Output File Format\
 The output file will document the events and results as follows:
 ```
 <Number of processes> processes
@@ -41,7 +41,7 @@ Errors should be handled gracefully with specific messages:
   - Missing quantum for Round Robin: "Error: Missing quantum parameter when use is 'rr'"
   - No input file: "Usage: scheduler-gpt.py <input file>"
 
-Deliverables
+Deliverables\
   - Individual Prompts and Iterations: Each team member provides their prompts and iteration history.
   - Final Submission: The best result from the team, both in code and in the final conversation, with comments listing team members.
   - Final Report: A detailed evaluation of the AI-generated code, including correctness, efficiency, readability, completeness, innovation, and overall quality.
