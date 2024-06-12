@@ -1,5 +1,5 @@
 import sys
-from ProcessDataStructure import *
+from dataStructure import *
 
 """
 This file contain the file parsing function and is dependent of the file 'ProcessDataStructure' that has
