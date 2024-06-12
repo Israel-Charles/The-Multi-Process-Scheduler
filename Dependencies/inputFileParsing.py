@@ -6,6 +6,7 @@ This file contain the file parsing function and is dependent of the file 'Proces
 the data structure of the Processes
 """
 
+# Function that takes in the input file and parse in the data of the file
 def parse_input_file(file_path):
     """
     Parses the input file to extract process details and scheduling parameters.
@@ -71,4 +72,4 @@ def parse_input_file(file_path):
         print("Error: Number of processes does not match 'processcount'.")
         sys.exit(1)
 
-    return process_count, process_list, run_for, algorithm, quantum
+    return process_list, run_for, algorithm, quantum

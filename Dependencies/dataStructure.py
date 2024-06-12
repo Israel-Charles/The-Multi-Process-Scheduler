@@ -1,3 +1,4 @@
+# Data Structure of the processes. Used throughout the program to represent each process
 class Process:
     def __init__(self, name, arrival_time, burst_time):
         """
@@ -12,23 +13,12 @@ class Process:
         self.name = name
         self.arrival_time = arrival_time
         self.burst_time = burst_time
-        self.remaining_burst_time = burst_time  # Time remaining for process execution
-        self.start_time = -1  # Time when the process starts execution 
-        self.finish_time = -1  # Time when the process finishes execution
-        self.waiting_time = 0  # Total waiting time in the ready queue
-        self.turnaround_time = 0  # Total time from arrival to completion
-        self.response_time = -1  # Time from arrival to first execution
-
-    def __repr__(self):
-        """
-        Provides a string representation of the process for debugging and logging.
-
-        :return: A string representing the process details
-        """
-        return (f"Process(name={self.name}, arrival_time={self.arrival_time}, burst_time={self.burst_time}, "
-                f"remaining_burst_time={self.remaining_burst_time}, start_time={self.start_time}, "
-                f"finish_time={self.finish_time}, waiting_time={self.waiting_time}, "
-                f"turnaround_time={self.turnaround_time}, response_time={self.response_time})")
+        self.remaining_burst_time = burst_time      # Time remaining for process execution
+        self.start_time = -1                        # Time when the process starts execution 
+        self.finish_time = -1                       # Time when the process finishes execution
+        self.waiting_time = 0                       # Total waiting time in the ready queue
+        self.turnaround_time = 0                    # Total time from arrival to completion
+        self.response_time = -1                     # Time from arrival to first execution
 
     def update_metrics(self, current_time):
         """

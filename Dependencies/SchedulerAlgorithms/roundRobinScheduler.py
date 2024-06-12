@@ -1,3 +1,4 @@
+# Round-Robin Scheduler Algorithm
 def round_robin_scheduler(process_list, run_for, quantum):
     """
     Simulate the Round Robin scheduling algorithm.
@@ -10,12 +11,15 @@ def round_robin_scheduler(process_list, run_for, quantum):
     Returns:
     list of str: Event log detailing the scheduling process.
     """
-    current_time = 0  # Initialize the current time
-    event_log = []  # Initialize the event log
-    process_queue = sorted(process_list, key=lambda p: p.arrival_time)  # Sort processes by arrival time
-    ready_queue = []  # Initialize the ready queue
+    current_time = 0                                # Initialize the current time
+    event_log = []                                  # Initialize the event log
+    ready_queue = []                                # Initialize the ready queue
+
+    # Sort processes by arrival time
+    process_queue = sorted(process_list, key=lambda p: p.arrival_time)
 
     while current_time < run_for and (process_queue or ready_queue):
+
         # Add processes to the ready queue as they arrive
         while process_queue and process_queue[0].arrival_time <= current_time:
             process = process_queue.pop(0)
