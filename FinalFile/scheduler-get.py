@@ -1,4 +1,5 @@
 import sys
+import random
 
 # Data Structure of the processes. Used throughout the program to represent each process
 class Process:
@@ -83,7 +84,7 @@ def parse_input_file(file_path):
             run_for = int(parts[1])
         elif parts[0] == "use":
             algorithm = parts[1].lower()
-            if algorithm not in ['fcfs', 'sjf', 'rr']:
+            if algorithm not in ['fcfs', 'sjf', 'rr', 'lottery']:
                 print("Error: Invalid scheduling algorithm.")
                 sys.exit(1)
         elif parts[0] == "quantum":
@@ -236,6 +237,56 @@ def round_robin_scheduler(process_list, run_for, quantum):
         current_time += 1
 
     return event_log
+
+def lottery_scheduling(processes, time_units):
+    event_log = []
+    current_time = 0
+    active_processes = processes[:]  # This will keep only active (not finished) processes
+
+    def calculate_total_tickets():
+        # Only active processes are considered for ticket assignment
+        return sum(max(1, 10 - p.remaining_burst_time) for p in active_processes if p.arrival_time <= current_time)
+    
+    while current_time < time_units:
+        total_tickets = calculate_total_tickets()
+
+        for process in processes:
+            if process.arrival_time == current_time:
+                event_log.append(f"Time {current_time} : {process.name} arrived")
+
+        if total_tickets > 0:
+            lottery = random.randint(1, total_tickets)
+            current_ticket = 0
+            current_process = None
+
+            for process in active_processes:
+                if process.arrival_time <= current_time:
+                    current_ticket += max(1, 10 - process.remaining_burst_time)
+                    if current_ticket >= lottery:
+                        current_process = process
+                        break
+
+            if current_process:
+                if current_process.remaining_burst_time > 0:
+                    if current_process.start_time == -1:
+                        current_process.set_start_time(current_time)
+
+                    event_log.append(f"Time {current_time} : {current_process.name} selected (burst {current_process.remaining_burst_time})")
+                    current_process.remaining_burst_time -= 1
+
+                    if current_process.remaining_burst_time == 0:
+                        current_process.set_finish_time(current_time + 1)
+                        event_log.append(f"Time {current_time} : {current_process.name} finished")
+                        active_processes.remove(current_process)  # Remove finished process from active list
+                else:
+                    # This check is necessary if the process remains in active_processes with 0 burst time
+                    active_processes.remove(current_process)
+        else:
+            event_log.append(f"Time {current_time} : Idle")
+
+        current_time += 1
+    
+    return event_log
     
 
 # Main function that sets the flow of the program
@@ -257,10 +308,14 @@ def main():
         event_log = fifo_scheduler(process_list, run_for)
     elif algorithm == 'sjf':
         event_log = preemptive_sjf_scheduler(process_list, run_for)
+    elif algorithm == 'lottery':
+        event_log = lottery_scheduling(process_list, run_for)
     """
 
     if algorithm == 'rr':
         event_log = round_robin_scheduler(process_list, run_for, quantum)
+    elif algorithm == 'lottery':
+        event_log = lottery_scheduling(process_list, run_for)
         
     output_file = input_file.replace(".in", ".out")
     write_output_file(output_file, process_list, algorithm, quantum, event_log, run_for)
