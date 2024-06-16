@@ -239,6 +239,31 @@ def round_robin_scheduler(process_list, run_for, quantum):
 
     return event_log
     
+def fifo_scheduler(process_list, run_for):
+    current_time = 0
+    event_log = []
+    process_queue = sorted(process_list, key=lambda p: p.arrival_time)
+    while current_time < run_for and process_queue:
+        current_process = process_queue.pop(0)
+        if current_time < current_process.arrival_time:
+            event_log.append(f"Time {current_time} : Idle")
+            current_time = current_process.arrival_time
+        
+        current_process.set_start_time(current_time)
+        event_log.append(f"Time {current_time} : {current_process.name} selected (burst {current_process.burst_time})")
+        current_time += current_process.burst_time
+        current_process.finish_time = current_time
+        current_process.update_metrics(current_time)
+        event_log.append(f"Time {current_time} : {current_process.name} finished")
+    
+    while current_time < run_for:
+        event_log.append(f"Time {current_time} : Idle")
+        current_time += 1
+    
+    return event_log
+
+
+  
 def preemptive_sjf_scheduler(process_list, run_for):
     """
     Simulate the Preemptive Shortest Job First (SJF) scheduling algorithm, ensuring proper event order.
@@ -399,6 +424,8 @@ def main():
         event_log = lottery_scheduling(process_list, run_for)
     elif algorithm == 'sjf':
         event_log = preemptive_sjf_scheduler(process_list, run_for)
+    elif algorithm == 'fcfs':
+        event_log = fifo_scheduler(process_list, run_for)    
         
     output_file = input_file.replace(".in", ".out")
     write_output_file(output_file, process_list, algorithm, quantum, event_log, run_for)
