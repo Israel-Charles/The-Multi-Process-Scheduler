@@ -1,5 +1,6 @@
 import sys
 import random
+import heapq
 
 # Data Structure of the processes. Used throughout the program to represent each process
 class Process:
@@ -237,11 +238,79 @@ def round_robin_scheduler(process_list, run_for, quantum):
         current_time += 1
 
     return event_log
+    
+def preemptive_sjf_scheduler(process_list, run_for):
+    """
+    Simulate the Preemptive Shortest Job First (SJF) scheduling algorithm, ensuring proper event order.
+    
+    Parameters:
+    process_list (list of Process): List of processes to be scheduled.
+    run_for (int): Total time units to run the simulation.
+
+    Returns:
+    list of str: Event log detailing the scheduling process.
+    """
+    current_time = 0
+    tick_events = {}  # Dictionary to store events by tick
+    ready_queue = []  # Initialize the ready queue as a min-heap
+    last_process = None  # Track the last process that was running
+
+    heapq.heapify(ready_queue)
+    process_queue = sorted(process_list, key=lambda p: p.arrival_time)
+
+    while current_time < run_for:
+        if current_time not in tick_events:
+            tick_events[current_time] = []
+
+        # Check and handle arrivals first to ensure they are logged before finishes
+        while process_queue and process_queue[0].arrival_time <= current_time:
+            process = process_queue.pop(0)
+            heapq.heappush(ready_queue, (process.remaining_burst_time, process))
+            tick_events[current_time].append(f"Time {current_time} : {process.name} arrived")
+
+        if not ready_queue:
+            tick_events[current_time].append(f"Time {current_time} : Idle")
+            current_time += 1
+            continue
+
+        # Process the queue and handle execution
+        _, current_process = heapq.heappop(ready_queue)
+
+        if last_process != current_process:
+            if current_process.start_time == -1:
+                current_process.start_time = current_time
+            current_process.response_time = max(current_process.response_time, current_time - current_process.arrival_time)
+            tick_events[current_time].append(f"Time {current_time} : {current_process.name} selected (burst {current_process.remaining_burst_time})")
+        last_process = current_process
+
+        # Simulate execution for 1 time unit
+        current_time += 1
+        if current_time not in tick_events:
+            tick_events[current_time] = []
+        current_process.remaining_burst_time -= 1
+
+        # Check for completion within the same tick
+        if current_process.remaining_burst_time == 0:
+            current_process.set_finish_time(current_time)
+            tick_events[current_time].append(f"Time {current_time} : {current_process.name} finished")
+            last_process = None
+        else:
+            # Re-add the process to the ready queue
+            heapq.heappush(ready_queue, (current_process.remaining_burst_time, current_process))
+
+    # Compile the final event log from the tick_events dictionary
+    event_log = []
+    for time in sorted(tick_events.keys()):
+        event_log.extend(tick_events[time])
+
+    return event_log
 
 def lottery_scheduling(processes, time_units):
     event_log = []
     current_time = 0
-    active_processes = processes[:]  # This will keep only active (not finished) processes
+    active_processes = processes[:]  # Keeps only active (not finished) processes
+    last_selected_process = None  # Tracks the last selected process
+    tick_events = {}  # Dictionary to hold events for each tick
 
     def calculate_total_tickets():
         # Only active processes are considered for ticket assignment
@@ -249,16 +318,22 @@ def lottery_scheduling(processes, time_units):
     
     while current_time < time_units:
         total_tickets = calculate_total_tickets()
+        current_process = None
 
+        # Initialize the list of events for the current tick if not already initialized
+        if current_time not in tick_events:
+            tick_events[current_time] = []
+
+        # Check and log arrivals at the current time
         for process in processes:
             if process.arrival_time == current_time:
-                event_log.append(f"Time {current_time} : {process.name} arrived")
+                tick_events[current_time].append(f"Time {current_time} : {process.name} arrived")
 
         if total_tickets > 0:
             lottery = random.randint(1, total_tickets)
             current_ticket = 0
-            current_process = None
 
+            # Lottery selection process
             for process in active_processes:
                 if process.arrival_time <= current_time:
                     current_ticket += max(1, 10 - process.remaining_burst_time)
@@ -266,28 +341,34 @@ def lottery_scheduling(processes, time_units):
                         current_process = process
                         break
 
+            # Process execution and logging
             if current_process:
                 if current_process.remaining_burst_time > 0:
-                    if current_process.start_time == -1:
-                        current_process.set_start_time(current_time)
+                    if last_selected_process != current_process:
+                        if current_process.response_time == -1:
+                            current_process.response_time = 0  # Set response time to 0 if it is -1
+                        tick_events[current_time].append(f"Time {current_time} : {current_process.name} selected (burst {max(0, current_process.remaining_burst_time)})")
+                    last_selected_process = current_process
 
-                    event_log.append(f"Time {current_time} : {current_process.name} selected (burst {current_process.remaining_burst_time})")
                     current_process.remaining_burst_time -= 1
 
+                    # Log when a process finishes
                     if current_process.remaining_burst_time == 0:
                         current_process.set_finish_time(current_time + 1)
-                        event_log.append(f"Time {current_time} : {current_process.name} finished")
+                        tick_events[current_time + 1] = tick_events.get(current_time + 1, []) + [f"Time {current_time + 1} : {current_process.name} finished"]
                         active_processes.remove(current_process)  # Remove finished process from active list
-                else:
-                    # This check is necessary if the process remains in active_processes with 0 burst time
-                    active_processes.remove(current_process)
+                        last_selected_process = None  # Reset last selected process as it has finished
         else:
-            event_log.append(f"Time {current_time} : Idle")
+            # Log idle without conditionally checking other events
+            tick_events[current_time].append(f"Time {current_time} : Idle")
 
         current_time += 1
     
+    # Compile events from tick_events dictionary into event_log list
+    for time in sorted(tick_events.keys()):
+        event_log.extend(tick_events[time])
+
     return event_log
-    
 
 # Main function that sets the flow of the program
 def main():
@@ -316,6 +397,8 @@ def main():
         event_log = round_robin_scheduler(process_list, run_for, quantum)
     elif algorithm == 'lottery':
         event_log = lottery_scheduling(process_list, run_for)
+    elif algorithm == 'sjf':
+        event_log = preemptive_sjf_scheduler(process_list, run_for)
         
     output_file = input_file.replace(".in", ".out")
     write_output_file(output_file, process_list, algorithm, quantum, event_log, run_for)
