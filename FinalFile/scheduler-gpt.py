@@ -1,3 +1,13 @@
+"""
+    ** Group 7 **
+    
+    Israel Charles
+    Melyia Ince-Ingram
+    Ahmad Altaher Alfayad
+    Monica Castro-Suarez
+    
+"""
+
 import sys
 import random
 import heapq
