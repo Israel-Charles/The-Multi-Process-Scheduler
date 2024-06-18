@@ -254,25 +254,36 @@ def fifo_scheduler(process_list, run_for):
     current_time = 0
     event_log = []
     process_queue = sorted(process_list, key=lambda p: p.arrival_time)
-    while current_time < run_for and process_queue:
-        current_process = process_queue.pop(0)
-        while current_time < current_process.arrival_time:
+    ready_queue = []
+    while current_time < run_for:
+        # Check for newly arrived processes
+        while process_queue and process_queue[0].arrival_time <= current_time:
+            new_process = process_queue.pop(0)
+            event_log.append(f"Time {current_time:>3} : {new_process.name} arrived")
+            ready_queue.append(new_process)
+
+        if ready_queue:
+            current_process = ready_queue.pop(0)
+            if current_process.start_time == -1:
+                current_process.set_start_time(current_time)
+            event_log.append(f"Time {current_time:>3} : {current_process.name} selected (burst {current_process.burst_time:>3})")
+            finish_time = current_time + current_process.burst_time
+            while current_time < finish_time:
+                current_time += 1
+                # Check for newly arrived processes during the execution of the current process
+                while process_queue and process_queue[0].arrival_time <= current_time:
+                    new_process = process_queue.pop(0)
+                    event_log.append(f"Time {current_time:>3} : {new_process.name} arrived")
+                    ready_queue.append(new_process)
+            current_process.finish_time = current_time
+            current_process.update_metrics(current_time)
+            event_log.append(f"Time {current_time:>3} : {current_process.name} finished")
+        else:
             event_log.append(f"Time {current_time:>3} : Idle")
             current_time += 1
-        event_log.append(f"Time {current_time:>3} : {current_process.name} arrived")
-        current_process.set_start_time(current_time)
-        event_log.append(f"Time {current_time:>3} : {current_process.name} selected (burst {current_process.burst_time:>3})")
-        current_time += current_process.burst_time
-        current_process.finish_time = current_time
-        current_process.update_metrics(current_time)
-        event_log.append(f"Time {current_time:>3} : {current_process.name} finished")
-    
-    while current_time < run_for:
-        event_log.append(f"Time {current_time:>3} : Idle")
-        current_time += 1
-    
-    return event_log
 
+    return event_log
+   
 # Function for the SJF Scheduler Algorithm  
 def preemptive_sjf_scheduler(process_list, run_for):
     """
