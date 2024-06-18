@@ -239,9 +239,10 @@ def round_robin_scheduler(process_list, run_for, quantum):
 
     return event_log
     
+
 def preemptive_sjf_scheduler(process_list, run_for):
     """
-    Simulate the Preemptive Shortest Job First (SJF) scheduling algorithm, ensuring proper event order.
+    Simulate the Preemptive Shortest Job First (SJF) scheduling algorithm.
     
     Parameters:
     process_list (list of Process): List of processes to be scheduled.
@@ -262,10 +263,9 @@ def preemptive_sjf_scheduler(process_list, run_for):
         if current_time not in tick_events:
             tick_events[current_time] = []
 
-        # Check and handle arrivals first to ensure they are logged before finishes
         while process_queue and process_queue[0].arrival_time <= current_time:
             process = process_queue.pop(0)
-            heapq.heappush(ready_queue, (process.remaining_burst_time, process))
+            heapq.heappush(ready_queue, (process.remaining_burst_time, process.name, process))
             tick_events[current_time].append(f"Time {current_time} : {process.name} arrived")
 
         if not ready_queue:
@@ -273,8 +273,7 @@ def preemptive_sjf_scheduler(process_list, run_for):
             current_time += 1
             continue
 
-        # Process the queue and handle execution
-        _, current_process = heapq.heappop(ready_queue)
+        _, _, current_process = heapq.heappop(ready_queue)
 
         if last_process != current_process:
             if current_process.start_time == -1:
@@ -284,19 +283,20 @@ def preemptive_sjf_scheduler(process_list, run_for):
         last_process = current_process
 
         # Simulate execution for 1 time unit
-        current_time += 1
-        if current_time not in tick_events:
-            tick_events[current_time] = []
+        next_time = current_time + 1
+        if next_time not in tick_events:
+            tick_events[next_time] = []
         current_process.remaining_burst_time -= 1
 
-        # Check for completion within the same tick
+        # Check for completion
         if current_process.remaining_burst_time == 0:
-            current_process.set_finish_time(current_time)
-            tick_events[current_time].append(f"Time {current_time} : {current_process.name} finished")
+            current_process.set_finish_time(next_time)
+            tick_events[next_time].append(f"Time {next_time} : {current_process.name} finished")
             last_process = None
         else:
-            # Re-add the process to the ready queue
-            heapq.heappush(ready_queue, (current_process.remaining_burst_time, current_process))
+            heapq.heappush(ready_queue, (current_process.remaining_burst_time, current_process.name, current_process))
+
+        current_time += 1
 
     # Compile the final event log from the tick_events dictionary
     event_log = []
