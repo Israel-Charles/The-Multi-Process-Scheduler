@@ -1,4 +1,4 @@
-# The-ChatGPT-Process-Scheduler
+# The-Multi-Process-Scheduler
 This software implements 4 process scheduling algorithms: FIFO (First In, First Out), Pre-emptive Shortest Job First (SJF), Round Robin (RR), and Lottery Scheduler. The implementation should be able to simulate the scheduling of multiple processes under each algorithm and calculate their turnaround time, response time, and wait time. The following key components are required:
 
 - Process Data Structure: Representing each process with its arrival time, execution time, and status.
