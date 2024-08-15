@@ -566,7 +566,7 @@ def generate_html_file(output_file, input_file, html_file):
 # Main function that sets the flow of the program
 def main():
     if len(sys.argv) != 2:
-        print("Usage: scheduler-get.py <input file>")
+        print("Usage: scheduler.py <input file>")
         sys.exit(1)
 
     input_file = sys.argv[1]
@@ -590,6 +590,12 @@ def main():
     
     html_file = input_file.replace(".in", "_out.html")
     generate_html_file(output_file, input_file, html_file)
+    print("Program ran succesfully!\n\n2 Files have been generated with the result.")
+    print("\t- An '.out' file that shows the result in text format")
+    print("\t- An '.html' file which has a visual representation of the result.\n")
+    print("To see the visual representation feel free to open the code section, ")
+    print("download the .html file and run it in your web browser.\n")
+    print("Thank you for using the program!!")
 
 if __name__ == "__main__":
     main()
