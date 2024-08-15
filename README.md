@@ -6,6 +6,14 @@ This software implements 4 process scheduling algorithms: FIFO (First In, First 
 - Time Slice Parameter: A Q-value for the Round Robin algorithm to determine the maximum time a process can run before being preempted.
 - Metric Calculation Functions: Functions to compute turnaround time, waiting time, and response time for each process.
 
+#### Demo > https://codepad.site/pad/0d81xqp1
+
+### To Run the Program
+*Note that the final file includes all the depencies in one file*</br>
+*Some test input files can be found in the Test_Files Folder*
+```
+python3 <input_file.in>
+```
 
 ### Input File Format
 The input file will have the following format:
